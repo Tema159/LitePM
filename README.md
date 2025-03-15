@@ -21,6 +21,10 @@ LitePM is a simple plugin for private messages, focused on SMP projects (compati
 
 ✅ Notification sound
 
+![](https://github.com/Tema159/LitePM/blob/master/gif1.gif)
+
+![](https://github.com/Tema159/LitePM/blob/master/gif2.gif)
+
 
 # Commands
 
