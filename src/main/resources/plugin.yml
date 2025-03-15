@@ -1,0 +1,19 @@
+name: LitePM
+version: '${project.version}'
+main: me.tema159.litepm.Main
+api-version: '1.16'
+
+commands:
+  m:
+    description: Send private message
+    aliases:
+      - msg
+      - w
+      - tell
+  mcolor:
+    description: Change nickname color in private messages
+  mignore:
+    description: Block / Unblock sending private messages from the player
+  mreload:
+    description: Reload LitePM plugin
+    permission: litepm.reload
