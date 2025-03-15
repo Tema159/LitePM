@@ -1,7 +1,7 @@
 LitePM is a simple plugin for private messages, focused on SMP projects (compatible with the Spigot core and higher)
 
 
-Main features:
+#Main features
 
 ✅ Unique color palette of nicknames, facilitating navigation in the chat stream
 
@@ -20,11 +20,17 @@ Main features:
 ✅ Notification sound
 
 
-Commands:
+#Commands
+
 🔹 /m, /w, /tell, /msg - sending a private message
+
 🔹 /mcolor - changing the color of the nickname in private messages
+
 🔹 /mignore - adding a player to the list ignore
+
 🔹 /mreload – reload configuration
 
-Permissions:
+
+#Permissions
+
 🔹 litepm.reload – access to reload configuration
