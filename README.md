@@ -1,11 +1,14 @@
 # Overview
 
-LitePM is a simple plugin for private messages, focused on SMP projects (compatible with the Spigot core and higher)
+LitePM is a simple Minecraft plugin for private messages, focused on SMP projects (compatible with the Spigot core and higher)
 
 
 # Main features
 
 ✅ Unique color palette of nicknames, facilitating navigation in the chat stream
+
+✅ Support specifying multiple targets for receiving a message.
+Example: /m [ player1 player2 player3 ] message
 
 ✅ Interactive messages with the ability to click
 
@@ -24,6 +27,8 @@ LitePM is a simple plugin for private messages, focused on SMP projects (compati
 ![](https://github.com/Tema159/LitePM/blob/master/gif1.gif)
 
 ![](https://github.com/Tema159/LitePM/blob/master/gif2.gif)
+
+![](https://github.com/Tema159/LitePM/blob/master/gif3.gif)
 
 
 # Commands
