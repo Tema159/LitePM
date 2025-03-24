@@ -31,25 +31,20 @@ public class mcolor implements CommandExecutor {
         short value;
         FileConfiguration config = Config.getConfig();
 
-        if (args.length != 1) {
-            pSendMessage(sender, config.getString("wrong"));
-            return true;
-        }
+        if (args.length != 1)
+            return pSendMessage(sender, config.getString("wrong"));
 
         try {
             value = Short.parseShort(args[0]);
-            if (!(value >= 0 && value <= 255)) {
-                pSendMessage(sender, "§c⏹§r " + config.getString("color-range") + " §e0 - 255");
-                return true;
-            }
+            if (!(value >= 0 && value <= 255))
+                return pSendMessage(sender, "§c⏹§r " + config.getString("color-range") + " §e0 - 255");
         } catch (NumberFormatException e) {
-            pSendMessage(sender, "§c⏹§r " + config.getString( "color-range") + " §e0 - 255");
-            return true;
+            return pSendMessage(sender, "§c⏹§r " + config.getString( "color-range") + " §e0 - 255");
         }
 
         int colorValue = setColor(sender, (float) value / 255.0f);
         sender.spigot().sendMessage(new ComponentBuilder("§a✎§r " + config.getString("color-set"))
-                .append(" " + args[0]).color(ChatColor.of(new Color(colorValue))).create());
+                .append(" " + value).color(ChatColor.of(new Color(colorValue))).create());
         return true;
     }
 }

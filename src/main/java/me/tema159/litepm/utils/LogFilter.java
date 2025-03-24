@@ -13,12 +13,10 @@ public class LogFilter extends AbstractFilter {
         if (msg != null && msg.contains("issued server command: ")) {
 
             String command = msg.replaceFirst("^.*?issued server command: ", "").trim();
-            String[] fixedArray = {"/m ", "/msg ", "/w ", "/tell "};
 
-            for (String prefix : fixedArray) {
-                if (command.startsWith(prefix)) {
+            for (String prefix : new String[] { "m ", "w ", "msg ", "tell " }) {
+                if (command.startsWith("/" + prefix))
                     return Result.DENY;
-                }
             }
         } return Result.NEUTRAL;
     }

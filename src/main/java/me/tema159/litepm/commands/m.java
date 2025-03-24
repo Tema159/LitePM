@@ -17,97 +17,144 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.awt.*;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static me.tema159.litepm.Main.*;
 
 public class m implements CommandExecutor {
 
     private FileConfiguration config;
+    private static Sound sound;
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
 
         config = Config.getConfig();
 
-        if (args.length == 0) {
-            msgConsoleOrPlayer(commandSender, config.getString("wrong"));
-            return true;
-        } Optional<Player> target = Optional.ofNullable(commandSender.getServer().getPlayerExact(args[0]));
+        if (args.length == 0)
+            return msgConsoleOrPlayer(commandSender, config.getString("wrong"));
 
-        if (target.isEmpty()) {
-            msgConsoleOrPlayer(commandSender, config.getString("not-found"));
-            return true;
-        } String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length)).trim();
+        HashSet<Player> targets = new HashSet<>();
+        Optional<Player> target;
+        byte count = 0;
 
-        if (message.isEmpty()) {
-            msgConsoleOrPlayer(commandSender, config.getString("empty"));
-            return true;
+        if (args[0].equals("[")) {
+
+            for (String str : args) {
+                if (str.equals("]")) break;
+                count++;
+            }
+
+            if (count == args.length || count < 2)
+                return msgConsoleOrPlayer(commandSender, config.getString("wrong"));
+
+            if (count > 11)
+                return msgConsoleOrPlayer(commandSender, "§c[\uD83D\uDC64 ... ] >≠ 10");
+
+            for (int i = 1; i < count; i++) {
+                target = Optional.ofNullable(commandSender.getServer().getPlayerExact(args[i]));
+                if (target.isEmpty())
+                    return msgConsoleOrPlayer(commandSender, args[i] + " " + config.getString("not-found"));
+                targets.add(target.get());
+            }
+
+        } else {
+            target = Optional.ofNullable(commandSender.getServer().getPlayerExact(args[0]));
+            if (target.isEmpty())
+                return msgConsoleOrPlayer(commandSender, args[0] + " " + config.getString("not-found"));
+            targets.add(target.get());
         }
 
-        Player receiver = target.get();
+        String message = String.join(" ", Arrays.copyOfRange(args, count + 1, args.length)).trim();
+
+        if (message.isEmpty())
+            return msgConsoleOrPlayer(commandSender, config.getString("empty"));
+
         NamespacedKey key = new NamespacedKey(Main.getPlugin(), "litepm.color");
 
         if (!(commandSender instanceof Player sender)) {
-            Bukkit.getConsoleSender().spigot().sendMessage(createBaseComponent(true, true, key, message, receiver));
-            receiver.spigot().sendMessage(createBaseComponent(false, true, key, message, receiver));
-            receiver.playSound(receiver.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1.0f, 1.0f);
-            return true;
+            Bukkit.getConsoleSender().spigot().sendMessage(createBaseComponent(true, true, key, message, targets.toArray(new Player[0])));
+            for (Player receiver : targets) {
+                receiver.spigot().sendMessage(createBaseComponent(false, true, key, message, receiver));
+                receiver.playSound(receiver.getLocation(), sound, 1.0f, 1.0f);
+            } return true;
         }
 
-        if (receiver.getUniqueId() == sender.getUniqueId()) {
-            pSendMessage(sender, "§c\uD83D\uDC64§r " + config.getString("yourself"));
-            return true;
+        UUID senderID = sender.getUniqueId();
+        ArrayList<String> metadata = MetaDataAsList(sender);
+
+        for (Player receiver : targets) {
+            if (receiver.getUniqueId() == senderID)
+                return pSendMessage(sender, "§c\uD83D\uDC64§r " + config.getString("yourself"));
+            if (metadata.contains(receiver.getName()))
+                return pSendMessage(sender, "§c\uD83D\uDC64§r " + receiver.getName() + " " + config.getString("ignore-already"));
+            if (!receiver.getPersistentDataContainer().has(key, PersistentDataType.INTEGER))
+                setColor(receiver, (float) Math.random());
+            else colorRange(receiver, key);
         }
 
-        for (Player p : Arrays.asList(sender, receiver))
-            if (!p.getPersistentDataContainer().has(key, PersistentDataType.INTEGER)) {
-                setColor(p, (float) Math.random());
-            } else {
-                colorRange(p, key);
-            }
+        if (!sender.getPersistentDataContainer().has(key, PersistentDataType.INTEGER))
+            setColor(sender, (float) Math.random());
+        else colorRange(sender, key);
 
-        if (MetaDataAsList(sender).contains(receiver.getName())) {
-            pSendMessage(sender, "§c\uD83D\uDC64§r " + receiver.getName() + " " + config.getString("ignore-already"));
-            return true;
-        }
+        sender.spigot().sendMessage(createBaseComponent(true, false, key, message, Stream.concat(targets.stream(), Stream.of(sender)).toArray(Player[]::new)));
+        String senderName = sender.getName();
 
-        sender.spigot().sendMessage(createBaseComponent(true, false, key, message, receiver, sender));
-
-        if (!MetaDataAsList(receiver).contains(sender.getName())) {
-            receiver.spigot().sendMessage(createBaseComponent(false, false, key, message, receiver, sender));
-            receiver.playSound(receiver.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1.0f, 1.0f);
-        } return true;
+        for (Player receiver : targets)
+            if (!MetaDataAsList(receiver).contains(senderName)) {
+                receiver.spigot().sendMessage(createBaseComponent(false, false, key, message, receiver, sender));
+                receiver.playSound(receiver.getLocation(), sound, 1.0f, 1.0f);
+            } return true;
     }
 
-    public static void msgConsoleOrPlayer (CommandSender s, String str) {
-        if (s instanceof Player sender) {
-            pSendMessage(sender, str);
-        } else {
-            Bukkit.getConsoleSender().sendMessage(str);
-        }
+    public static boolean msgConsoleOrPlayer (CommandSender s, String str) {
+        if (s instanceof Player sender)
+            return pSendMessage(sender, str);
+        else Bukkit.getConsoleSender().sendMessage(str);
+        return true;
     }
+
+    public static void setSound(Sound snd) { sound = snd; }
 
     private BaseComponent[] createBaseComponent(boolean firstConvert, boolean isConsole, NamespacedKey key, String message, Player... vars) {
     // firstConvert - Set first name to "Me"?
 
         String me = config.getString("Me");
+        Player pSender = vars[vars.length - 1];
         String[] args = Objects.requireNonNull(config.getString("format")).split("%s");
-        String var1name = firstConvert ? (isConsole ? "Console" : me) : (isConsole ? "Console" : vars[1].getName());
-        String var2name = firstConvert ? vars[0].getName() : me;
-        ChatColor var1col = (isConsole ? ChatColor.GREEN : ChatColor.of(new Color(colorRange(vars[1], key))));
 
-        ComponentBuilder cb = new ComponentBuilder(args[0]).color(ChatColor.WHITE);
+        String firstName = isConsole ? "Console" : (firstConvert ? me : pSender.getName());
+        ChatColor var1col = isConsole ? ChatColor.GREEN : ChatColor.of(new Color(colorRange(pSender, key)));
+
+        ComponentBuilder cb = new ComponentBuilder().color(ChatColor.WHITE);
+
         if (!isConsole) {
-            cb.event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/m " + vars[1].getName() + " "))
+            StringBuilder clickName;
+
+            if (firstConvert && vars.length > 2) {
+                clickName = new StringBuilder("[ ");
+                for (int i = 0; i < vars.length - 1; i++)
+                    clickName.append(vars[i].getName()).append(" ");
+                clickName.append("]");
+            } else clickName = new StringBuilder(firstConvert ? vars[0].getName() : pSender.getName());
+
+            cb.event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/m " + clickName + " "))
                     .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(config.getString("click"))));
         }
 
-        return cb
-                .append(var1name).color(var1col)
+        cb.append(args[0])
+                .append(firstName).color(var1col)
                 .append(args[1]).color(ChatColor.WHITE)
-                .append(var2name).color(ChatColor.of(new Color(colorRange(vars[0], key))))
-                .append(args[2]).color(ChatColor.WHITE)
-                .append(" " + message).reset()
-                .create();
+                .append(firstConvert ? vars[0].getName() : me).color(ChatColor.of(new Color(colorRange(vars[0], key))));
+
+        if (isConsole ? (vars.length != 1) : (vars.length > 2))
+            cb.append(", ").color(ChatColor.WHITE);
+
+        for (int i = 1; i < vars.length; i++) {
+            if (isConsole || i != vars.length - 1)
+                cb.append(vars[i].getName()).color(ChatColor.of(new Color(colorRange(vars[i], key))));
+            if (i < vars.length - (isConsole ? 1 : 2))
+                cb.append(", ").color(ChatColor.WHITE);
+        } return cb.append(args[2]).color(ChatColor.WHITE).append(" " + message).reset().create();
     }
 }

@@ -54,9 +54,7 @@ public final class Main extends JavaPlugin {
         rootLogger.addFilter(new LogFilter());
     }
 
-    public static void setSendmsgtype(ChatMessageType cmt) {
-        sendmsgtype = cmt;
-    }
+    public static void setSendmsgtype(ChatMessageType cmt) { sendmsgtype = cmt; }
 
     public static Main getPlugin() { return plugin; }
 
@@ -70,20 +68,20 @@ public final class Main extends JavaPlugin {
     }
 
     public static ArrayList<String> MetaDataAsList(Player p) {
-        if (p.hasMetadata("litepm.ignore")) {
+        if (p.hasMetadata("litepm.ignore"))
             return new ArrayList<>(Arrays.asList(p.getMetadata("litepm.ignore").get(0).asString().split(",")));
-        } return new ArrayList<>();
+        return new ArrayList<>();
     }
 
-    public static void pSendMessage(Player p, String str) {
+    public static boolean pSendMessage(Player p, String str) {
         p.spigot().sendMessage(sendmsgtype, new TextComponent(str));
+        return true;
     }
 
     public static Integer colorRange(Player p, NamespacedKey key) {
         Integer colorData = p.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
-        if (colorData == null || colorData <= 0 || colorData > 0xFFFFFF) {
+        if (colorData == null || colorData <= 0 || colorData > 0xFFFFFF)
             return setColor(p, (float) Math.random());
-        }
         return colorData;
     }
 

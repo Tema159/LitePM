@@ -39,65 +39,53 @@ public class mignore implements CommandExecutor {
         switch (args[0]) {
             
             case "list":
-                if (args.length != 1) {
-                    pSendMessage(sender, config.getString("wrong"));
-                    return true;
-                }
+                if (args.length != 1)
+                    return pSendMessage(sender, config.getString("wrong"));
 
                 if (!datalist.isEmpty()) {
                     ComponentBuilder cb = new ComponentBuilder("✎ " + config.getString("ignore-list") + " ");
                     HoverEvent hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("click"));
 
                     for (String str : datalist) {
+
                         cb.append(str)
                                 .event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/mignore " + str))
                                 .event(hover);
-                        if (!str.equals(datalist.get(datalist.size() - 1))) {
+                        if (!str.equals(datalist.get(datalist.size() - 1)))
                             cb.append(", ").reset();
-                        }
+
                     } sender.spigot().sendMessage(cb.create());
 
-                } else {
-                    pSendMessage(sender, "§e✎§r " + config.getString("ignore-empty"));
-                }
+                    return true;
 
-                return true;
+                } else return pSendMessage(sender, "§e✎§r " + config.getString("ignore-empty"));
 
             case "player":
-                if (args.length != 2) {
-                    pSendMessage(sender, config.getString("wrong"));
-                    return true;
-                } Optional<Player> target = Optional.ofNullable(commandSender.getServer().getPlayerExact(args[1]));
+                if (args.length != 2)
+                    return pSendMessage(sender, config.getString("wrong"));
+                Optional<Player> target = Optional.ofNullable(commandSender.getServer().getPlayerExact(args[1]));
 
-                if (target.isEmpty()) {
-                    pSendMessage(sender, config.getString("not-found"));
-                    return true;
-                } Player receiver = target.get();
+                if (target.isEmpty())
+                    return pSendMessage(sender, config.getString("not-found"));
+                Player receiver = target.get();
 
-                if (receiver.getUniqueId() == sender.getUniqueId()) {
-                    pSendMessage(sender, "§c\uD83D\uDC64§r " + config.getString("yourself"));
-                    return true;
-                }
-
+                if (receiver.getUniqueId() == sender.getUniqueId())
+                    return pSendMessage(sender, "§c\uD83D\uDC64§r " + config.getString("yourself"));
                 String recName = receiver.getName();
 
                 if (datalist.contains(recName)) {
                     datalist.remove(recName);
-                    pSendMessage(sender, "§e\uD83D\uDC64§r " + recName + " " + Config.getConfig().getString("ignore-remove"));
                     if (datalist.isEmpty()) {
                         sender.removeMetadata("litepm.ignore", Main.getPlugin());
-                        return true;
-                    }
+                    } return pSendMessage(sender, "§e\uD83D\uDC64§r " + recName + " " + Config.getConfig().getString("ignore-remove"));
                 } else {
                     datalist.add(recName);
-                    pSendMessage(sender, "§a\uD83D\uDC64§r " + recName + " " + Config.getConfig().getString("ignore-add"));
-                } sender.setMetadata("litepm.ignore", new FixedMetadataValue(Main.getPlugin(), String.join(",", datalist)));
-
-                return true;
+                    sender.setMetadata("litepm.ignore", new FixedMetadataValue(Main.getPlugin(), String.join(",", datalist)));
+                    return pSendMessage(sender, "§a\uD83D\uDC64§r " + recName + " " + Config.getConfig().getString("ignore-add"));
+                }
 
             default:
-                pSendMessage(sender, config.getString("wrong"));
-                return true;
+                return pSendMessage(sender, config.getString("wrong"));
         }
     }
 }

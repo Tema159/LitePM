@@ -1,5 +1,5 @@
 name: LitePM
-version: '1.0-SNAPSHOT'
+version: '1.1'
 main: me.tema159.litepm.Main
 api-version: '1.16'
 
@@ -7,8 +7,8 @@ commands:
   m:
     description: Send private message
     aliases:
-      - msg
       - w
+      - msg
       - tell
   mcolor:
     description: Change nickname color in private messages

@@ -20,12 +20,20 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
                 default -> new ArrayList<>();
             };
         }
-        if (strings.length == 2) {
-            if (s.equals("mignore") && Objects.equals(strings[0], "player")) {
-                return null;
-            } if (s.equals("m")) {
+
+        if (s.equals("m") && strings.length > 1 && strings[0].equals("[")) {
+            if (strings[strings.length - 2].equals("]"))
                 return List.of(Objects.requireNonNull(Config.getConfig().getString("message")));
-            }
+            for (String str : strings)
+                if (str.equals("]")) return new ArrayList<>();
+            return null;
+        }
+
+        if (strings.length == 2) {
+            if (s.equals("mignore") && Objects.equals(strings[0], "player"))
+                return null;
+            if (s.equals("m"))
+                return List.of(Objects.requireNonNull(Config.getConfig().getString("message")));
         } return new ArrayList<>();
     }
 }

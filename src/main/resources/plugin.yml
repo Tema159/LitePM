@@ -7,8 +7,8 @@ commands:
   m:
     description: Send private message
     aliases:
-      - msg
       - w
+      - msg
       - tell
   mcolor:
     description: Change nickname color in private messages
