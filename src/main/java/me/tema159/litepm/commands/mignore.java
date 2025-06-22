@@ -43,15 +43,16 @@ public class mignore implements CommandExecutor {
                     return pSendMessage(sender, config.getString("wrong"));
 
                 if (!datalist.isEmpty()) {
+
                     ComponentBuilder cb = new ComponentBuilder("✎ " + config.getString("ignore-list") + " ");
                     HoverEvent hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("click"));
+                    String lastStr = datalist.get(datalist.size() - 1);
 
                     for (String str : datalist) {
-
                         cb.append(str)
                                 .event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/mignore " + str))
                                 .event(hover);
-                        if (!str.equals(datalist.get(datalist.size() - 1)))
+                        if (!str.equals(lastStr))
                             cb.append(", ").reset();
 
                     } sender.spigot().sendMessage(cb.create());
@@ -75,9 +76,9 @@ public class mignore implements CommandExecutor {
 
                 if (datalist.contains(recName)) {
                     datalist.remove(recName);
-                    if (datalist.isEmpty()) {
+                    if (datalist.isEmpty())
                         sender.removeMetadata("litepm.ignore", Main.getPlugin());
-                    } return pSendMessage(sender, "§e\uD83D\uDC64§r " + recName + " " + Config.getConfig().getString("ignore-remove"));
+                    return pSendMessage(sender, "§e\uD83D\uDC64§r " + recName + " " + Config.getConfig().getString("ignore-remove"));
                 } else {
                     datalist.add(recName);
                     sender.setMetadata("litepm.ignore", new FixedMetadataValue(Main.getPlugin(), String.join(",", datalist)));

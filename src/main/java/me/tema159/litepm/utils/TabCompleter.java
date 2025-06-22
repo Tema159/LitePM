@@ -12,14 +12,13 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
 
-        if (strings.length == 1) {
+        if (strings.length == 1)
             return switch (s) {
                 case "mignore" -> List.of("list", "player");
                 case "mcolor" -> List.of("0-255");
                 case "m" -> null;
                 default -> new ArrayList<>();
             };
-        }
 
         if (s.equals("m") && strings.length > 1 && strings[0].equals("[")) {
             if (strings[strings.length - 2].equals("]"))

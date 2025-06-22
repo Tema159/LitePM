@@ -2,7 +2,6 @@ package me.tema159.litepm;
 
 import me.tema159.litepm.commands.*;
 import me.tema159.litepm.utils.*;
-import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
@@ -17,25 +16,17 @@ import java.time.Instant;
 import java.util.*;
 
 import static java.awt.Color.HSBtoRGB;
+import static me.tema159.litepm.utils.Config.sendmsgtype;
 
 public final class Main extends JavaPlugin {
 
     private static Main plugin;
     private static final Map<UUID, Instant> cd = new HashMap<>();
-    private static ChatMessageType sendmsgtype;
 
     @Override
     public void onEnable() {
-
         plugin = this;
-
-        try {
-            new Config().setupConfig();
-        } catch (IllegalArgumentException e) {
-            getLogger().severe("[LitePM] Config error: " + e.getMessage());
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        new Config().setupConfig();
 
         Map<String, CommandExecutor> commandMap = Map.of(
                 "m", new m(),
@@ -53,8 +44,6 @@ public final class Main extends JavaPlugin {
         Logger rootLogger = (Logger) LogManager.getRootLogger();
         rootLogger.addFilter(new LogFilter());
     }
-
-    public static void setSendmsgtype(ChatMessageType cmt) { sendmsgtype = cmt; }
 
     public static Main getPlugin() { return plugin; }
 

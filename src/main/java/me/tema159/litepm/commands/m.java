@@ -7,7 +7,6 @@ import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,7 +23,6 @@ import static me.tema159.litepm.Main.*;
 public class m implements CommandExecutor {
 
     private FileConfiguration config;
-    private static Sound sound;
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
@@ -35,7 +33,6 @@ public class m implements CommandExecutor {
             return msgConsoleOrPlayer(commandSender, config.getString("wrong"));
 
         HashSet<Player> targets = new HashSet<>();
-        Optional<Player> target;
         byte count = 0;
 
         if (args[0].equals("[")) {
@@ -52,14 +49,14 @@ public class m implements CommandExecutor {
                 return msgConsoleOrPlayer(commandSender, "§c[\uD83D\uDC64 ... ] >≠ 10");
 
             for (int i = 1; i < count; i++) {
-                target = Optional.ofNullable(commandSender.getServer().getPlayerExact(args[i]));
+                Optional<Player> target = Optional.ofNullable(commandSender.getServer().getPlayerExact(args[i]));
                 if (target.isEmpty())
                     return msgConsoleOrPlayer(commandSender, args[i] + " " + config.getString("not-found"));
                 targets.add(target.get());
             }
 
         } else {
-            target = Optional.ofNullable(commandSender.getServer().getPlayerExact(args[0]));
+            Optional<Player> target = Optional.ofNullable(commandSender.getServer().getPlayerExact(args[0]));
             if (target.isEmpty())
                 return msgConsoleOrPlayer(commandSender, args[0] + " " + config.getString("not-found"));
             targets.add(target.get());
@@ -76,7 +73,7 @@ public class m implements CommandExecutor {
             Bukkit.getConsoleSender().spigot().sendMessage(createBaseComponent(true, true, key, message, targets.toArray(new Player[0])));
             for (Player receiver : targets) {
                 receiver.spigot().sendMessage(createBaseComponent(false, true, key, message, receiver));
-                receiver.playSound(receiver.getLocation(), sound, 1.0f, 1.0f);
+                receiver.playSound(receiver.getLocation(), Config.sound, 1.0f, 1.0f);
             } return true;
         }
 
@@ -103,23 +100,21 @@ public class m implements CommandExecutor {
         for (Player receiver : targets)
             if (!MetaDataAsList(receiver).contains(senderName)) {
                 receiver.spigot().sendMessage(createBaseComponent(false, false, key, message, receiver, sender));
-                receiver.playSound(receiver.getLocation(), sound, 1.0f, 1.0f);
+                receiver.playSound(receiver.getLocation(), Config.sound, 1.0f, 1.0f);
             } return true;
     }
 
-    public static boolean msgConsoleOrPlayer (CommandSender s, String str) {
+    public static boolean msgConsoleOrPlayer(CommandSender s, String str) {
         if (s instanceof Player sender)
             return pSendMessage(sender, str);
         else Bukkit.getConsoleSender().sendMessage(str);
         return true;
     }
 
-    public static void setSound(Sound snd) { sound = snd; }
-
     private BaseComponent[] createBaseComponent(boolean firstConvert, boolean isConsole, NamespacedKey key, String message, Player... vars) {
     // firstConvert - Set first name to "Me"?
 
-        String me = config.getString("Me");
+        String me = config.getString("me");
         Player pSender = vars[vars.length - 1];
         String[] args = Objects.requireNonNull(config.getString("format")).split("%s");
 
