@@ -3,26 +3,25 @@ package me.tema159.litepm.utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class TabCompleter implements org.bukkit.command.TabCompleter {
+    public static final List<String> defCommands = Arrays.asList("m", "w", "msg", "tell");
 
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-
         if (strings.length == 1)
-            return switch (s) {
-                case "mignore" -> List.of("list", "player");
-                case "mcolor" -> List.of("0-255");
-                case "m" -> null;
-                default -> new ArrayList<>();
-            };
+            switch (s) {
+                case "mignore": return Arrays.asList("list", "player");
+                case "mcolor": return Collections.singletonList("0-255");
+                case "m": case "w": case "msg": case "tell": return null;
+                default: return new ArrayList<>();
+            }
+        List<String> message = Collections.singletonList(Config.getMessage("message"));
 
-        if (s.equals("m") && strings.length > 1 && strings[0].equals("[")) {
+        if (defCommands.contains(s) && strings.length > 1 && strings[0].equals("[")) {
             if (strings[strings.length - 2].equals("]"))
-                return List.of(Objects.requireNonNull(Config.getConfig().getString("message")));
+                return message;
             for (String str : strings)
                 if (str.equals("]")) return new ArrayList<>();
             return null;
@@ -31,8 +30,8 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
         if (strings.length == 2) {
             if (s.equals("mignore") && Objects.equals(strings[0], "player"))
                 return null;
-            if (s.equals("m"))
-                return List.of(Objects.requireNonNull(Config.getConfig().getString("message")));
+            if (defCommands.contains(s))
+                return message;
         } return new ArrayList<>();
     }
 }

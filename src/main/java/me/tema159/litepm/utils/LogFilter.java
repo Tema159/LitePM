@@ -7,11 +7,8 @@ public class LogFilter extends AbstractFilter {
 
     @Override
     public Result filter(LogEvent event) {
-
         String msg = event.getMessage().getFormattedMessage();
-
         if (msg != null && msg.contains("issued server command: ")) {
-
             String command = msg.replaceFirst("^.*?issued server command: ", "").trim();
 
             for (String prefix : new String[] { "m ", "w ", "msg ", "tell " })

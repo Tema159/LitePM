@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.awt.*;
@@ -19,31 +18,33 @@ public class mcolor implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
-
-        if (!(commandSender instanceof Player sender)) {
-            Bukkit.getConsoleSender().sendMessage("Player §conly§r command");
+        if (!(commandSender instanceof Player)) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Player only command");
             return true;
         }
+        Player sender = (Player) commandSender;
 
         if (hasCooldown(sender.getUniqueId())) return true;
         setCooldown(sender.getUniqueId(), Duration.ofSeconds(1));
 
-        short value;
-        FileConfiguration config = Config.getConfig();
-
+        int value;
         if (args.length != 1)
-            return pSendMessage(sender, config.getString("wrong"));
+            return pSendMessage(sender, Config.getMessage("wrong"));
+        String stopEmoji = ChatColor.RED + "⏹ " + ChatColor.RESET;
 
         try {
-            value = Short.parseShort(args[0]);
+            value = Integer.parseInt(args[0]);
             if (!(value >= 0 && value <= 255))
-                return pSendMessage(sender, "§c⏹§r " + config.getString("color-range") + " §e0 - 255");
+                return pSendMessage(sender, stopEmoji + Config.getMessage("color-range")
+                        + ChatColor.YELLOW + " 0 - 255");
         } catch (NumberFormatException e) {
-            return pSendMessage(sender, "§c⏹§r " + config.getString( "color-range") + " §e0 - 255");
+            return pSendMessage(sender, stopEmoji + Config.getMessage( "color-range")
+                    + ChatColor.YELLOW + " 0 - 255");
         }
 
         int colorValue = setColor(sender, (float) value / 255.0f);
-        sender.spigot().sendMessage(new ComponentBuilder("§a✎§r " + config.getString("color-set"))
+        sender.spigot().sendMessage(new ComponentBuilder(ChatColor.GREEN + "✎ " + ChatColor.RESET
+                + Config.getMessage("color-set"))
                 .append(" " + value).color(ChatColor.of(new Color(colorValue))).create());
         return true;
     }

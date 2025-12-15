@@ -7,10 +7,10 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
@@ -24,27 +24,24 @@ public class mignore implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
-
-        if (!(commandSender instanceof Player sender)) {
-            Bukkit.getConsoleSender().sendMessage("Player §conly§r command");
+        if (!(commandSender instanceof Player)) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Player only command");
             return true;
         }
+        Player sender = (Player) commandSender;
 
         if (hasCooldown(sender.getUniqueId())) return true;
         setCooldown(sender.getUniqueId(), Duration.ofSeconds(1));
-
-        FileConfiguration config = Config.getConfig();
         ArrayList<String> datalist = MetaDataAsList(sender);
 
         switch (args[0]) {
-            
             case "list":
                 if (args.length != 1)
-                    return pSendMessage(sender, config.getString("wrong"));
+                    return pSendMessage(sender, Config.getMessage("wrong"));
 
                 if (!datalist.isEmpty()) {
 
-                    ComponentBuilder cb = new ComponentBuilder("✎ " + config.getString("ignore-list") + " ");
+                    ComponentBuilder cb = new ComponentBuilder("✎ " + Config.getMessage("ignore-list") + " ");
                     HoverEvent hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("click"));
                     String lastStr = datalist.get(datalist.size() - 1);
 
@@ -59,34 +56,38 @@ public class mignore implements CommandExecutor {
 
                     return true;
 
-                } else return pSendMessage(sender, "§e✎§r " + config.getString("ignore-empty"));
+                } else return pSendMessage(sender, ChatColor.YELLOW + "✎ " + ChatColor.RESET
+                        + Config.getMessage("ignore-empty"));
 
             case "player":
                 if (args.length != 2)
-                    return pSendMessage(sender, config.getString("wrong"));
+                    return pSendMessage(sender, Config.getMessage("wrong"));
                 Optional<Player> target = Optional.ofNullable(commandSender.getServer().getPlayerExact(args[1]));
 
-                if (target.isEmpty())
-                    return pSendMessage(sender, config.getString("not-found"));
+                if (!target.isPresent())
+                    return pSendMessage(sender, Config.getMessage("not-found"));
                 Player receiver = target.get();
 
+                String playerEmoji = "\uD83D\uDC64 " + ChatColor.RESET;
                 if (receiver.getUniqueId() == sender.getUniqueId())
-                    return pSendMessage(sender, "§c\uD83D\uDC64§r " + config.getString("yourself"));
+                    return pSendMessage(sender, ChatColor.RED + playerEmoji + Config.getMessage("yourself"));
                 String recName = receiver.getName();
 
                 if (datalist.contains(recName)) {
                     datalist.remove(recName);
                     if (datalist.isEmpty())
                         sender.removeMetadata("litepm.ignore", Main.getPlugin());
-                    return pSendMessage(sender, "§e\uD83D\uDC64§r " + recName + " " + Config.getConfig().getString("ignore-remove"));
+                    return pSendMessage(sender, ChatColor.YELLOW + playerEmoji
+                            + recName + " " + Config.getMessage("ignore-remove"));
                 } else {
                     datalist.add(recName);
                     sender.setMetadata("litepm.ignore", new FixedMetadataValue(Main.getPlugin(), String.join(",", datalist)));
-                    return pSendMessage(sender, "§a\uD83D\uDC64§r " + recName + " " + Config.getConfig().getString("ignore-add"));
+                    return pSendMessage(sender, ChatColor.GREEN + playerEmoji + recName
+                            + " " + Config.getMessage("ignore-add"));
                 }
 
             default:
-                return pSendMessage(sender, config.getString("wrong"));
+                return pSendMessage(sender, Config.getMessage("wrong"));
         }
     }
 }

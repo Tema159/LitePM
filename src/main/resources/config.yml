@@ -1,0 +1,24 @@
+# Message sending format, '%s' must be specified twice
+format: "[%s → %s]"
+
+# https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
+sound: "BLOCK_NOTE_BLOCK_BELL"
+
+# Type of sending system messages (ACTIONBAR, CHAT)
+system: "ACTIONBAR"
+
+messages:
+  me: "Me"
+  click: "Click to send a private message"
+  color-range: "&cIncorrect&r color specified! Range:"
+  color-set: "Color &ahas been set&r:"
+  empty: "Message &cis empty"
+  ignore-add: "&aadded&r to blacklist"
+  ignore-already: "is &cblacklisted"
+  ignore-empty: "The blacklist is currently &eempty"
+  ignore-list: "Blacklist:"
+  ignore-remove: "&eremoved&r from blacklist"
+  message: "message"
+  not-found: "&cnot found"
+  wrong: "&cIncorrect&r arguments entered"
+  yourself: "You &ccannot&r specify &cyourself!"

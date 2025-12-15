@@ -26,20 +26,26 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
+        plugin.saveDefaultConfig();
         new Config().setupConfig();
 
-        Map<String, CommandExecutor> commandMap = Map.of(
-                "m", new m(),
-                "mcolor", new mcolor(),
-                "mignore", new mignore(),
-                "mreload", new mreload()
-        );
-
         TabCompleter tabCompleter = new TabCompleter();
-        for (Map.Entry<String, CommandExecutor> entry : commandMap.entrySet()) {
+        Map<String, CommandExecutor> commandMap = new HashMap<>();
+
+        commandMap.put("m", new m());
+        commandMap.put("mcolor", new mcolor());
+        commandMap.put("mignore", new mignore());
+        commandMap.put("mreload", new mreload());
+
+        ArrayList<String> commands = new ArrayList<>();
+        commands.addAll(TabCompleter.defCommands);
+        commands.addAll(commandMap.keySet());
+
+        for (Map.Entry<String, CommandExecutor> entry : commandMap.entrySet())
             Objects.requireNonNull(getCommand(entry.getKey())).setExecutor(entry.getValue());
-            Objects.requireNonNull(getCommand(entry.getKey())).setTabCompleter(tabCompleter);
-        }
+
+        for (String command : commands)
+            Objects.requireNonNull(getCommand(command)).setTabCompleter(tabCompleter);
 
         Logger rootLogger = (Logger) LogManager.getRootLogger();
         rootLogger.addFilter(new LogFilter());
