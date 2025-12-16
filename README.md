@@ -1,3 +1,4 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/tema159/litepm/badge)](https://www.codefactor.io/repository/github/tema159/litepm)
 # Overview
 
 LitePM is a simple Minecraft plugin for private messages, focused on SMP projects (compatible with the Spigot core and higher)
