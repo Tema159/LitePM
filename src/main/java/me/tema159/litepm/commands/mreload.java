@@ -2,6 +2,7 @@ package me.tema159.litepm.commands;
 
 import me.tema159.litepm.Main;
 import me.tema159.litepm.utils.Config;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -33,9 +34,9 @@ public final class mreload implements CommandExecutor {
 
         String reloaded = ChatColor.GREEN + "Plugin has been reloaded!";
         if (commandSender instanceof Player)
-            commandSender.sendMessage(ChatColor.GREEN + "[LitePM] " + reloaded);
+            commandSender.sendMessage("[LitePM] " + reloaded);
 
-        plugin.getLogger().info(reloaded);
+        Bukkit.getConsoleSender().sendMessage(reloaded);
         return true;
     }
 }
